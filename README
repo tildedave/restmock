@@ -1,0 +1,25 @@
+# mock-restful
+
+restmock is a server that serves mostly static content.  This content
+is determined by a config file external to the server; restmock reads
+this config file and generates a handler based off of it.
+
+## Usage
+
+Put your config file and any files that will be served by restmock in
+$CONFIG_LOCATION.  This location will need to be on your classpath
+when you run the server to be visible.
+
+lein deps
+lein uberjar
+java -classpath $CONFIG_LOCATION:./restmock-1.0.0-SNAPSHOT-standalone.jar restmock.core --config <default config.xml> --port <default 5000>
+
+Because of how java -jar works (sets classpath to that in the
+Manifest), it is not possible to run restmock with java -jar and still
+have it properly read the configuration.
+
+## License
+
+Copyright (C) 2010 Dave King <tildedave@gmail.com>
+
+Distributed under the Eclipse Public License, the same as Clojure.
