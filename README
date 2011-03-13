@@ -18,6 +18,30 @@ Because of how java -jar works (sets classpath to that in the
 Manifest), it is not possible to run restmock with java -jar and still
 have it properly read the configuration.
 
+Configuration is specified by an XML file.  Paths are regular
+expressions.  On match you can return static XML or JSON.
+
+<xml>
+  <routes>
+    <route>
+      <path>/foo</path>
+      <text>foo</text>
+    </route>
+    <route>
+      <path>/bar</path>
+      <text>bar</text>
+    </route>
+    <route>
+      <path>/person/([0-9]+)</path>
+      <file>person.xml</file>
+      <type>xml</type>
+    </route>
+  </routes>
+</xml>
+
+Files specified by your configuration also need to be accessible from
+your classpath.
+
 ## License
 
 Copyright (C) 2010 Dave King <tildedave@gmail.com>
