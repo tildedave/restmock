@@ -1,4 +1,4 @@
-# mock-restful
+# restmock
 
 restmock is a server that serves mostly static content.  This content
 is determined by a config file external to the server; restmock reads
