@@ -1,5 +1,8 @@
 (ns restmock.mock
-  (:use fleetdb.client))
+  (:use fleetdb.client
+        ring.util.response
+        ))
+
 
 ;; Mock endpoint --
 ;;
@@ -55,4 +58,12 @@
 (defn put-id [url id data]
   (client ["update" url {"data" data} (where-id id)]))
 
-;; TODO: does ring support HEAD requests correctly here?
+;; TODO:
+;;
+;; switch on req type
+;; switch on req url
+;; get req data
+
+(defn mock-handler [name type]
+  (fn [req]
+    (response "bunnies!")))

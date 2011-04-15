@@ -37,20 +37,19 @@
 (defn json-response [data]
   (contenttype-response data "application/json"))
 
-(defn serve [file response-wrapper]
+(defn serve-file [file response-wrapper]
   (-> (slurp (ClassLoader/getSystemResource file)) response-wrapper))
 
-(defn response-for-spec [spec]
-  (let [response-info (:response spec)
-        text (:text response-info)
-        file (:file response-info)
-        type (:type response-info)]
-    (if (nil? text)
-      (match type
-             "xml" (serve file xml-response)
-             "json" (serve file json-response)
-             _     {:status 404})
-      (response text))))
+;; HANDLER TYPES
+
+(defn text-handler [text]
+  (fn [req] (response text)))
+
+(defn xml-handler [file]
+  (fn [req] (serve-file file xml-response)))
+
+(defn json-handler [file]
+  (fn [req] (serve-file file json-response)))
 
 ;; CONFIG HELPERS
 
@@ -59,21 +58,30 @@
            stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-str)))]
        (zip/xml-zip (xml/parse stream))))
 
-(defn get-response-for-route [route-zip]
-  (let [text (zf/xml1-> route-zip :text zf/text)]
-    (if (nil? text)
-      (let [file (zf/xml1-> route-zip :file zf/text)
-             type (zf/xml1-> route-zip :type zf/text)]
-         {:file file
-          :type type})
-      {:text text})))
+(defn get-handler-for-route [route-zip]
+  (let [type (zf/xml1-> route-zip :type zf/text)]
+    (match type
+           "text" (text-handler (zf/xml1-> route-zip :config :text zf/text))
+           "xml"  (xml-handler (zf/xml1-> route-zip :config :file zf/text))
+           "json" (json-handler (zf/xml1-> route-zip :config :file zf/text))
+           "mock" (mock-handler (zf/xml1-> route-zip :config :name zf/text)
+                                (zf/xml1-> route-zip :config :contentType zf/text)))
+           )))
+
+
+      ;;      (if (nil? text)
+      ;; (let [file (zf/xml1-> route-zip :file zf/text)
+      ;;        type (zf/xml1-> route-zip :type zf/text)]
+      ;;    {:file file
+      ;;     :type type})
+      ;; {:text text})))
 
 (defn config-to-route-map [xml-zip]
   (for [route (zf/xml-> xml-zip :routes :route)]
     (let [uri-re (zf/xml1-> route :path zf/text)
-          response (get-response-for-route route)]
+          response (get-handler-for-route route)]
       {:uri-re uri-re
-       :response response})))
+       :handler response})))
 
 ;; HANDLERS
 
@@ -85,14 +93,14 @@
                                 matches (re-matches re req-uri)]
                               matches))
                         routes)
-        responses (map response-for-spec matching-specs)
+        handlers (map :handler matching-specs)
         ]
-    (if (empty? responses)
+    (if (empty? handlers)
       {:status 404}
       (do
         (log :info (str "[HANDLER] Matched route "
                         (:uri-re (first matching-specs))))
-        (first responses)))))
+        ((first handlers) req)))))
   
 (defn ring-handler [config-file req]
   (let [routes  (config-to-route-map (config-zip config-file))
