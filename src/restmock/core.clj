@@ -1,5 +1,6 @@
 (ns restmock.core
-  (:use ring.util.response
+  (:use restmock.mock
+        ring.util.response
         ring.middleware.params
         clojure.contrib.logging
         clojure.contrib.command-line
