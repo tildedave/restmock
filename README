@@ -19,22 +19,43 @@ Manifest), it is not possible to run restmock with java -jar and still
 have it properly read the configuration.
 
 Configuration is specified by an XML file.  Paths are regular
-expressions.  On match you can return static XML or JSON.
+expressions.  On match you can return static XML or JSON, text, or a
+mock REST endpoint that will behave as expected to GET, PUT, POST, and
+DELETE calls.
+
+There is currently no support for XML/JSON validation or special
+behavior on POSTs.  What you post is what you get (WYPIWYG).
 
 <xml>
   <routes>
     <route>
       <path>/foo</path>
-      <text>foo</text>
+      <type>text</type>
+      <config>
+        <text>foo</text>
+      </config>
     </route>
     <route>
       <path>/bar</path>
-      <text>bar</text>
+      <type>text</type>
+      <config>
+        <text>bar</text>
+      </config>
     </route>
     <route>
       <path>/person/([0-9]+)</path>
-      <file>person.xml</file>
       <type>xml</type>
+      <config>
+        <file>person.xml</file>
+      </config>
+    </route>
+    <route>
+      <path>/photos/</path>
+      <type>mock</type>
+      <config>
+        <name>photos</name>
+        <contentType>xml</contentType>
+      </config>
     </route>
   </routes>
 </xml>
@@ -42,8 +63,17 @@ expressions.  On match you can return static XML or JSON.
 Files specified by your configuration also need to be accessible from
 your classpath.
 
+## Changes in 1.0
+
+* Initial release
+
+## Changes in 1.1
+
+* Add concept of 'mock' path which mimics a standard REST endpoint
+* Slightly change structure of config file to be more consistent
+
 ## License
 
 Copyright (C) 2010 Dave King <tildedave@gmail.com>
 
-Distributed under the Eclipse Public License, the same as Clojure.
+          Distributed under the Eclipse Public License, the same as Clojure.
