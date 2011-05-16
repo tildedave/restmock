@@ -29,33 +29,49 @@ behavior on POSTs.  What you post is what you get (WYPIWYG).
 <xml>
   <routes>
     <route>
-      <path>/foo</path>
-      <type>text</type>
-      <config>
-        <text>foo</text>
-      </config>
+      <request>
+        <path>/foo</path>
+      </request>
+      <response>
+        <type>text</type>
+        <config>
+          <text>foo</text>
+        </config>
+      </response>
     </route>
     <route>
-      <path>/bar</path>
-      <type>text</type>
-      <config>
-        <text>bar</text>
-      </config>
+      <request>
+        <path>/bar</path>
+      </request>
+      <response>
+        <type>text</type>
+        <config>
+          <text>bar</text>
+        </config>
+      </response>
     </route>
     <route>
-      <path>/person/([0-9]+)</path>
-      <type>xml</type>
-      <config>
-        <file>person.xml</file>
-      </config>
+      <request>
+        <path>/person/([0-9]+)</path>
+      </request>
+      <response>
+        <type>xml</type>
+        <config>
+          <file>person.xml</file>
+        </config>
+      </response>
     </route>
     <route>
-      <path>/photos/</path>
-      <type>mock</type>
-      <config>
-        <name>photos</name>
-        <contentType>xml</contentType>
-      </config>
+      <request>
+         <path>/photos/</path>
+      </request>
+      <response>
+         <type>mock</type>
+         <config>
+           <name>photos</name>
+           <contentType>xml</contentType>
+         </config>
+      </response>
     </route>
   </routes>
 </xml>

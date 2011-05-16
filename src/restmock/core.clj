@@ -14,6 +14,7 @@
 
 (defn log-response [resp]
   (log :info (format "[RESPONSE] %s" (:status resp)))
+  (log :debug (format "[RESPONSE] %s" resp))
   resp)
 
 (defn log-request [req]
@@ -26,20 +27,20 @@
 
 (defn matching-uri-handler [routes req]
   (let [req-uri (:uri req)
-        matching-specs (filter
-                        (fn [spec]
-                          (let [re (re-pattern (:uri-re spec))
-                                matches (re-matches re req-uri)]
-                              matches))
-                        routes)
-        handlers (map :handler matching-specs)
-        ]
-    (if (empty? handlers)
+        matching-routes (filter
+                         (fn [r] (do
+                                   (log :debug
+                                        (str "[HANDLER] Checking " (:id r)
+                                             " against " req-uri))
+                                   ((:request r) req-uri)))
+                         routes)]
+    (if (empty? matching-routes)
       {:status 404}
       (do
         (log :info (str "[HANDLER] Matched route "
-                        (:uri-re (first matching-specs))))
-        ((first handlers) req)))))
+                        (:id (first matching-routes))
+                        " with " (first matching-routes)))
+        ((:response (first matching-routes)) req)))))
   
 (defn ring-handler [config-file req]
   (let [routes  (config-to-route-map (config-zip config-file))
