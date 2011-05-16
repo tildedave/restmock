@@ -31,3 +31,14 @@
 (defn json-handler [file]
   (fn [req] (serve-file file json-response)))
 
+(defn status-handler [status]
+  (fn [req] {:status status}))
+
+
+
+
+
+
+
+
+

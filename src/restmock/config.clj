@@ -22,6 +22,8 @@
              "text" (text-handler (zf/xml1-> route-zip :response :config :text zf/text))
              "xml"  (xml-handler (zf/xml1-> route-zip :response :config :file zf/text))
              "json" (json-handler (zf/xml1-> route-zip :response :config :file zf/text))
+             "status" (status-handler (java.lang.Integer/parseInt
+                                       (zf/xml1-> route-zip :response :config :status zf/text)))
 ;           "mock" (mock-handler (zf/xml1-> route-zip :config :name zf/text)
 ;                                (zf/xml1-> route-zip :config :contentType zf/text)))
              ))))
