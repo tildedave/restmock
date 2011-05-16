@@ -24,18 +24,26 @@
              "json" (json-handler (zf/xml1-> route-zip :response :config :file zf/text))
 ;           "mock" (mock-handler (zf/xml1-> route-zip :config :name zf/text)
 ;                                (zf/xml1-> route-zip :config :contentType zf/text)))
-           ))))
+             ))))
+
+(defn request-matches-route-path [route]
+  (let [uri-re (zf/xml1-> route :request :path zf/text)
+        re (re-pattern uri-re)]
+    (fn [req]
+      (re-matches re (:uri req)))))
+    
+(defn request-matches-route-method [route]
+  (let [method (zf/xml1-> route :request :method zf/text)]
+    (fn [req]
+      (if (nil? method)
+        true
+        (= method (str (:request-method req)))))))
 
 (defn request-for-route [route]
-  (let [uri-re (zf/xml1-> route :request :path zf/text)
-        re (re-pattern uri-re)
-        ;method (zf/xml1-> route :request :method zf/text)
-        ]
-    (fn [req]
-      (do
-        (log :debug (str "[CONFIG] Received URI " (:uri req) ".  "
-                         "Matching against " re))
-        (re-matches re (:uri req))))))
+  (fn [req]
+    (and
+     ((request-matches-route-method route) req)
+     ((request-matches-route-path route) req))))
 
 (defn config-to-route-map [xml-zip]
   (for [route (zf/xml-> xml-zip :routes :route)]
