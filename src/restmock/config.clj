@@ -28,12 +28,14 @@
 
 (defn request-for-route [route]
   (let [uri-re (zf/xml1-> route :request :path zf/text)
-        re (re-pattern uri-re)]
-    (fn [req-uri]
+        re (re-pattern uri-re)
+        ;method (zf/xml1-> route :request :method zf/text)
+        ]
+    (fn [req]
       (do
-        (log :debug (str "[CONFIG] Received URI " req-uri ".  "
+        (log :debug (str "[CONFIG] Received URI " (:uri req) ".  "
                          "Matching against " re))
-        (re-matches re req-uri)))))
+        (re-matches re (:uri req))))))
 
 (defn config-to-route-map [xml-zip]
   (for [route (zf/xml-> xml-zip :routes :route)]

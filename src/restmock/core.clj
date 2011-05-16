@@ -26,13 +26,12 @@
 ;; HANDLERS
 
 (defn matching-uri-handler [routes req]
-  (let [req-uri (:uri req)
-        matching-routes (filter
+  (let [matching-routes (filter
                          (fn [r] (do
                                    (log :debug
                                         (str "[HANDLER] Checking " (:id r)
-                                             " against " req-uri))
-                                   ((:request r) req-uri)))
+                                             " against " req))
+                                   ((:request r) req)))
                          routes)]
     (if (empty? matching-routes)
       {:status 404}
