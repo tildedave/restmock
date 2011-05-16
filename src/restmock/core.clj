@@ -1,14 +1,13 @@
 (ns restmock.core
-  (:use restmock.mock
+  (:use ;restmock.mock
+        restmock.config
+        restmock.handler
         ring.util.response
         ring.middleware.params
         clojure.contrib.logging
         clojure.contrib.command-line
         pattern-match
         [ring.adapter.jetty :only [run-jetty]])
-  (:require [clojure.zip :as zip])
-  (:require [clojure.xml :as xml])
-  (:require [clojure.contrib.zip-filter.xml :as zf])
   (:gen-class))
 
 ;; MIDDLEWARE
@@ -22,66 +21,6 @@
     (log :info (format "[REQUEST] %s %s"
                        (:request-method req) (:uri req)))
     req))
-
-;; RESPONSE HELPERS
-
-(defn contenttype-response [data type]
-  (let [wrapped-response (response data)]
-    (assoc wrapped-response :headers
-           (merge (:headers wrapped-response)
-                  {"Content-Type" type}))))
-
-(defn xml-response [data]
-  (contenttype-response data "application/xml"))
-
-(defn json-response [data]
-  (contenttype-response data "application/json"))
-
-(defn serve-file [file response-wrapper]
-  (-> (slurp (ClassLoader/getSystemResource file)) response-wrapper))
-
-;; HANDLER TYPES
-
-(defn text-handler [text]
-  (fn [req] (response text)))
-
-(defn xml-handler [file]
-  (fn [req] (serve-file file xml-response)))
-
-(defn json-handler [file]
-  (fn [req] (serve-file file json-response)))
-
-;; CONFIG HELPERS
-
-(defn config-zip [config-xml]
-     (let [xml-str (slurp (ClassLoader/getSystemResource config-xml))
-           stream (java.io.ByteArrayInputStream. (.getBytes (.trim xml-str)))]
-       (zip/xml-zip (xml/parse stream))))
-
-(defn get-handler-for-route [route-zip]
-  (let [type (zf/xml1-> route-zip :type zf/text)]
-    (match type
-           "text" (text-handler (zf/xml1-> route-zip :config :text zf/text))
-           "xml"  (xml-handler (zf/xml1-> route-zip :config :file zf/text))
-           "json" (json-handler (zf/xml1-> route-zip :config :file zf/text))
-           "mock" (mock-handler (zf/xml1-> route-zip :config :name zf/text)
-                                (zf/xml1-> route-zip :config :contentType zf/text)))
-           )))
-
-
-      ;;      (if (nil? text)
-      ;; (let [file (zf/xml1-> route-zip :file zf/text)
-      ;;        type (zf/xml1-> route-zip :type zf/text)]
-      ;;    {:file file
-      ;;     :type type})
-      ;; {:text text})))
-
-(defn config-to-route-map [xml-zip]
-  (for [route (zf/xml-> xml-zip :routes :route)]
-    (let [uri-re (zf/xml1-> route :path zf/text)
-          response (get-handler-for-route route)]
-      {:uri-re uri-re
-       :handler response})))
 
 ;; HANDLERS
 
