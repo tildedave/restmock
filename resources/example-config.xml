@@ -1,0 +1,66 @@
+<xml>
+  <routes>
+    <route>
+      <id>Hello, world!</id>
+      <request>
+        <path>/hello</path>
+      </request>
+      <response>
+        <type>text</type>
+        <config>
+          <text>Hello, world!</text>
+        </config>
+      </response>
+    </route>
+    <route>
+      <id>can retrieve all the kittens</id>
+      <request>
+        <path>/kittens</path>
+        <method>:get</method>
+      </request>
+      <response>
+        <type>text</type>
+        <config>
+          <text>Some adorable kittens!</text>
+        </config>
+      </response>
+    </route>
+    <route>
+      <id>can't make a new kitten</id>
+      <request>
+        <path>/kittens</path>
+        <method>:post</method>
+      </request>
+      <response>
+        <type>status</type>
+        <config>
+          <status>422</status>
+        </config>
+      </response>
+    </route>
+    <route>
+      <id>can update a kitten</id>
+      <request>
+        <path>/kittens/([0-9]+)</path>
+        <method>:put</method>
+      </request>
+      <response>
+        <type>status</type>
+        <config>
+          <status>202</status>
+        </config>
+      </response>
+    </route>
+    <route>
+      <request>
+        <path>/person/([0-9]+)</path>
+      </request>
+      <response>
+        <type>xml</type>
+        <config>
+          <file>person.xml</file>
+        </config>
+      </response>
+    </route>
+  </routes>
+</xml>
