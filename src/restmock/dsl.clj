@@ -28,8 +28,24 @@
 (defmacro uri
   "Specifies a criteria of matching a URI"
   [path]
-  `#(not (nil? (re-matches (re-pattern ~path) (:uri %)))))
+  `(fn [req#]
+     (if (nil? (:uri req#))
+       false
+       (not (nil? (re-matches (re-pattern ~path) (:uri req#)))))))
 
-;(defmacro request
-;  "Specifies a list of mathching criteria"
-;  [ 
+(defmacro method
+  "Specifies a criteria of matching a HTTP request's method"
+  [method]
+  `(fn [req#] (= ~method (:method req#))))
+
+;; TODO: idiomatic way to get curried 'and'?
+(defmacro request
+  "Specifies a list of criteria to match a request on"
+  [& criteria]
+  `(fn [req#]
+     ;; safest to use dual-strategy reduce/map because
+     ;; reduce's default behavior won't evaluate
+     ;; function on 1 argument
+     (reduce #(and %1 %2)
+             (map #(% req#)
+                  (list ~@criteria)))))
