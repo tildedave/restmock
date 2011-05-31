@@ -13,8 +13,7 @@
                  [fleetdb-client "0.2.2"]
                  ]
 
-  :dev-dependencies [[swank-clojure "1.2.1"]
-                     [lein-ring "0.3.2"]]
+  :dev-dependencies [[lein-ring "0.3.2"]]
   :ring {:handler restmock.core/handler}
   :main restmock.core
 )
