@@ -62,22 +62,22 @@
 (defmacro text
   "Specifies a text response handler"
   [text]
-  `(fn [req#] (text-handler ~text)))
+  `(text-handler ~text))
 
 (defmacro xml-file
   "Specifies a xml file handler"
   [file]
-  `(fn [req#] (xml-handler ~file)))
+  `(xml-handler ~file))
 
 (defmacro json-file
   "Specifies a JSON file handler"
   [file]
-  `(fn [req#] (json-handler ~file)))
+  `(json-handler ~file))
 
 (defmacro status
   "Specifies a status handler"
   [num]
-  `(fn [req#] (status-handler ~num)))
+  `(status-handler ~num))
 
 (defmacro route
   "Specifies a route with request criteria and response"
