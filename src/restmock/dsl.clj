@@ -1,10 +1,13 @@
-(ns restmock.dsl)
+(ns restmock.dsl
+  (:use restmock.handler
+        clojure.contrib.logging)
+  )
 
 ;; DSL for Restmock
 ;;
 ;; Intended syntax:
 ;;
-;; (handler
+;; (routes
 ;;  (route "Hello, world!"
 ;;         (request (uri "/hello"))
 ;;         (response (text "Hello, world!")))
@@ -39,6 +42,7 @@
   `(fn [req#] (= ~method (:method req#))))
 
 ;; TODO: idiomatic way to get curried 'and'?
+;; TODO: more idiomatic way to do (list ~@criteria) ?
 (defmacro request
   "Specifies a list of criteria to match a request on"
   [& criteria]
@@ -49,3 +53,40 @@
      (reduce #(and %1 %2)
              (map #(% req#)
                   (list ~@criteria)))))
+
+(defmacro response
+  "Specifies a response handler"
+  [handler]
+  `(fn [req#] (~handler req#)))
+
+(defmacro text
+  "Specifies a text response handler"
+  [text]
+  `(fn [req#] (text-handler ~text)))
+
+(defmacro xml-file
+  "Specifies a xml file handler"
+  [file]
+  `(fn [req#] (xml-handler ~file)))
+
+(defmacro json-file
+  "Specifies a JSON file handler"
+  [file]
+  `(fn [req#] (json-handler ~file)))
+
+(defmacro status
+  "Specifies a status handler"
+  [num]
+  `(fn [req#] (status-handler ~num)))
+
+(defmacro route
+  "Specifies a route with request criteria and response"
+  [request response]
+  `{:request ~request,
+    :response ~response})
+
+(defmacro routes
+  "A routes is a collection of route handlers"
+  [& routes]
+  `{:execute
+    (matching-uri-handler routes)})

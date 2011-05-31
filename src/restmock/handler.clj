@@ -1,6 +1,8 @@
 (ns restmock.handler
   (:use ring.util.response
-        ring.middleware.params)
+        ring.middleware.params
+        clojure.contrib.logging
+        )
   )
 
 ;; RESPONSE HELPERS
@@ -34,11 +36,15 @@
 (defn status-handler [status]
   (fn [req] {:status status}))
 
-
-
-
-
-
-
-
-
+(defn- get-matching-routes [routes req]
+  (filter (fn [r] ((:request r) req)) routes))
+  
+(defn matching-uri-handler [routes req]
+  (let [matching-routes (get-matching-routes routes req)]
+    (if (empty? matching-routes)
+      {:status 404}
+      (do
+        (log :info (str "[HANDLER] Matched route "
+                        (:id (first matching-routes))
+                        " with " (first matching-routes)))
+        ((:response (first matching-routes)) req)))))
