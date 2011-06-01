@@ -105,7 +105,9 @@
    req))
 
 (defn load-restmock-config [file]
-  (do
-    ;; UGLY UGLY UGLY FIGURE OUT HOW TO REMOVE
-    (in-ns 'restmock.dsl)
-    (load-file file)))
+  (let [orig-ns *ns*]
+    (do
+      ;; UGLY UGLY UGLY FIGURE OUT HOW TO REMOVE
+      (in-ns 'restmock.dsl)
+      (load-file file)
+      (in-ns (ns-name orig-ns)))))
