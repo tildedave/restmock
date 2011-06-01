@@ -92,7 +92,7 @@
   [& routes]
   `(defn route-handler [req#]
      (matching-uri-handler (list ~@routes) req#)))
-
+     
 (def default-route-handler
   (route
    "Default route"
@@ -105,9 +105,6 @@
    req))
 
 (defn load-restmock-config [file]
-  (let [orig-ns *ns*]
-    (do
-      ;; UGLY UGLY UGLY FIGURE OUT HOW TO REMOVE
-      (in-ns 'restmock.dsl)
-      (load-file file)
-      (in-ns (ns-name orig-ns)))))
+  (do
+    (binding [*ns* (find-ns 'restmock.dsl)]
+      (load-file file))))
