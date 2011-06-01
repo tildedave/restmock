@@ -24,17 +24,17 @@
 (testing "method macro"
   (testing "should match"
     (is (matching-req?
-         (method :get) {:method :get}))
+         (method :get) {:request-method :get}))
     (is (matching-req?
-         (method :post) {:method :post}))))
+         (method :post) {:request-method :post}))))
 
 (testing "request macro"
   (testing "should match"
     (is (matching-req?
-         (request (method :get)) {:method :get}))
+         (request (method :get)) {:request-method :get}))
     (is (matching-req?
          (request (method :get)
-                  (uri "/foo")) {:method :get, :uri "/foo"})))
+                  (uri "/foo")) {:request-method :get, :uri "/foo"})))
   (testing "should not match"
     (is (not-matching-req?
          (request (uri "/foo")
@@ -43,5 +43,5 @@
     (is (not-matching-req?
          (request (uri "/foo")
                   (method :get))
-         {:method :get}))))
+         {:request-method :get}))))
       

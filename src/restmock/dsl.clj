@@ -39,7 +39,8 @@
 (defmacro method
   "Specifies a criteria of matching a HTTP request's method"
   [method]
-  `(fn [req#] (= ~method (:method req#))))
+  `(fn [req#]
+     (= ~method (:request-method req#))))
 
 ;; TODO: idiomatic way to get curried 'and'?
 ;; TODO: more idiomatic way to do (list ~@criteria) ?
@@ -81,8 +82,9 @@
 
 (defmacro route
   "Specifies a route with request criteria and response"
-  [request response]
-  `{:request ~request,
+  [id request response]
+  `{:id ~id,
+    :request ~request,
     :response ~response})
 
 (defmacro routes
@@ -92,7 +94,8 @@
      (matching-uri-handler (list ~@routes) req#)))
 
 (def default-route-handler
-  (route 
+  (route
+   "Default route"
    (request (uri ".*"))
    (response (status 404))))
 

@@ -45,6 +45,5 @@
       {:status 404}
       (do
         (log :info (str "[HANDLER] Matched route "
-                        (:id (first matching-routes))
-                        " with " (first matching-routes)))
+                        (:id (first matching-routes))))
         ((:response (first matching-routes)) req)))))
