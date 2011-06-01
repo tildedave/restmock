@@ -88,5 +88,21 @@
 (defmacro routes
   "A routes is a collection of route handlers"
   [& routes]
-  `{:execute
-    (matching-uri-handler routes)})
+  `(defn route-handler [req#]
+     (matching-uri-handler (list ~@routes) req#)))
+
+(def default-route-handler
+  (route 
+   (request (uri ".*"))
+   (response (status 404))))
+
+(defn route-handler [req]
+  (matching-uri-handler
+   (list default-route-handler)
+   req))
+
+(defn load-restmock-config [file]
+  (do
+    ;; UGLY UGLY UGLY FIGURE OUT HOW TO REMOVE
+    (in-ns 'restmock.dsl)
+    (load-file file)))

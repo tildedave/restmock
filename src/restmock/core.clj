@@ -1,8 +1,8 @@
 (ns restmock.core
+  (:require [clojure.contrib.java-utils :as java-utils])
   (:use ;restmock.mock
-        restmock.config
+        restmock.dsl
         restmock.handler
-        ring.util.response
         ring.middleware.params
         clojure.contrib.logging
         clojure.contrib.command-line
@@ -25,39 +25,28 @@
 
 ;; HANDLERS
 
-(defn matching-uri-handler [routes req]
-  (let [matching-routes (filter
-                         (fn [r] (do
-                                   (log :debug
-                                        (str "[HANDLER] Checking " (:id r)
-                                             " against " req))
-                                   ((:request r) req)))
-                         routes)]
-    (if (empty? matching-routes)
-      {:status 404}
-      (do
-        (log :info (str "[HANDLER] Matched route "
-                        (:id (first matching-routes))
-                        " with " (first matching-routes)))
-        ((:response (first matching-routes)) req)))))
-  
 (defn ring-handler [config-file req]
-  (let [routes  (config-to-route-map (config-zip config-file))
-        req (log-request req)
-        resp (matching-uri-handler routes req)
+  (let [req (log-request req)
+        resp (route-handler req)
         resp (log-response resp)]
     resp))
+
+(defn can-find-file [config]
+  (or
+   (not (nil? (ClassLoader/getSystemResource config)))
+   (.exists (java-utils/file config))))
 
 (defn -main [& args]
      (with-command-line args
        "Mock restful server"
        [[port "Port to run Jetty server on." "5000"]
-        [config "Config file to read routes from." "config.xml"]
+        [config "Config file to read routes from." "config.clj"]
         remaining]
-       (if (nil? (ClassLoader/getSystemResource config))
+       (if (not (can-find-file config))
          (log :error (str "Could not find " config " on the classpath."))
          (do
            (log :info (str "Found configuration in " config))
+           (load-restmock-config config)
            (run-jetty
             (fn [req] (ring-handler config req))
             {:port (Integer/parseInt port)})))))
