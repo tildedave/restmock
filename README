@@ -18,63 +18,37 @@ Because of how java -jar works (sets classpath to that in the
 Manifest), it is not possible to run restmock with java -jar and still
 have it properly read the configuration.
 
-Configuration is specified by an XML file.  Paths are regular
-expressions.  On match you can return static XML or JSON, text, or a
-mock REST endpoint that will behave as expected to GET, PUT, POST, and
-DELETE calls.
+In the true Clojure way, configuration is specified by a DSL.  There
+are a few imporant concepts for configuration:
 
-There is currently no support for XML/JSON validation or special
-behavior on POSTs.  What you post is what you get (WYPIWYG).
+* A route is a possible matcher for a request.  It contains a 
+  request matcher and a response.
+* A request matcher is a set of criteria that, if true, will 
+  activate the response.
+* A response is the response that will be returned to the client.
+  This can be static XML/JSON or static text.
 
-<xml>
-  <routes>
-    <route>
-      <request>
-        <path>/foo</path>
-      </request>
-      <response>
-        <type>text</type>
-        <config>
-          <text>foo</text>
-        </config>
-      </response>
-    </route>
-    <route>
-      <request>
-        <path>/bar</path>
-      </request>
-      <response>
-        <type>text</type>
-        <config>
-          <text>bar</text>
-        </config>
-      </response>
-    </route>
-    <route>
-      <request>
-        <path>/person/([0-9]+)</path>
-      </request>
-      <response>
-        <type>xml</type>
-        <config>
-          <file>person.xml</file>
-        </config>
-      </response>
-    </route>
-    <route>
-      <request>
-         <path>/photos/</path>
-      </request>
-      <response>
-         <type>mock</type>
-         <config>
-           <name>photos</name>
-           <contentType>xml</contentType>
-         </config>
-      </response>
-    </route>
-  </routes>
-</xml>
+The following is an example config file:
+
+(routes
+ (route "Hello, world!"
+        (request (uri "/hello"))
+        (response (text "Hello, world!")))
+ (route "Can retrieve all the kittens"
+        (request (uri "/kittens")
+                 (method :get))
+        (response (text "Some adorable kittens!")))
+ (route "Can't make a new kitten"
+        (request (uri "/kittens")
+                 (method :post))
+        (response (status 422)))
+ (route "Can update a kitten"
+        (request (uri "/kittens/([0-9]+)")
+                 (method :put))
+        (response (status 202)))
+ (route "Person XML"
+        (request (uri "/person/([0-9]+)"))
+        (response (file "person.xml"))))
 
 Files specified by your configuration also need to be accessible from
 your classpath.
@@ -85,8 +59,7 @@ your classpath.
 
 ## Changes in 1.1
 
-* Add concept of 'mock' path which mimics a standard REST endpoint
-* Slightly change structure of config file to be more consistent
+* Rewrite configuration to be DSL based.
 
 ## License
 
