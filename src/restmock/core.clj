@@ -19,8 +19,8 @@
 
 (defn log-request [req]
   (do
-    (log :info (format "[REQUEST] %s %s"
-                       (:request-method req) (:uri req)))
+    (log :info (format "[REQUEST] %s %s %s"
+                       (:request-method req) (:uri req) (:body req)))
     req))
 
 (defn expand-request-body [req]
@@ -29,10 +29,11 @@
 ;; HANDLERS
 
 (defn ring-handler [config-file req]
-  (let [req (log-request req)
-        resp (route-handler req)
-        resp (log-response resp)]
-    resp))
+  (-> req
+      expand-request-body
+      log-request
+      route-handler
+      log-response))
 
 (defn can-find-file [config]
   (or
