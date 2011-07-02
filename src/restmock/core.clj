@@ -23,6 +23,9 @@
                        (:request-method req) (:uri req)))
     req))
 
+(defn expand-request-body [req]
+  (assoc req :body (slurp (:body req))))
+
 ;; HANDLERS
 
 (defn ring-handler [config-file req]
