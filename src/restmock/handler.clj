@@ -5,19 +5,19 @@
         )
   )
 
-;; RESPONSE HELPERS
+;; RESPONSE WRAPPERS
 
-(defn contenttype-response [data type]
+(defn contenttype-response-wrapper [data type]
   (let [wrapped-response (response data)]
     (assoc wrapped-response :headers
            (merge (:headers wrapped-response)
                   {"Content-Type" type}))))
 
-(defn xml-response [data]
-  (contenttype-response data "application/xml"))
+(defn xml-response-wrapper [data]
+  (contenttype-response-wrapper data "application/xml"))
 
-(defn json-response [data]
-  (contenttype-response data "application/json"))
+(defn json-response-wrapper [data]
+  (contenttype-response-wrapper data "application/json"))
 
 (defn serve-file [file response-wrapper]
   (-> (slurp (ClassLoader/getSystemResource file)) response-wrapper))
@@ -27,11 +27,11 @@
 (defn text-handler [text]
   (fn [req] (response text)))
 
-(defn xml-handler [file]
-  (fn [req] (serve-file file xml-response)))
+(defn xml-file-handler [file]
+  (fn [req] (serve-file file xml-response-wrapper)))
 
-(defn json-handler [file]
-  (fn [req] (serve-file file json-response)))
+(defn json-file-handler [file]
+  (fn [req] (serve-file file json-response-wrapper)))
 
 (defn status-handler [status]
   (fn [req] {:status status}))

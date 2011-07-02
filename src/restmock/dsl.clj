@@ -68,12 +68,12 @@
 (defmacro xml-file
   "Specifies a xml file handler"
   [file]
-  `(xml-handler ~file))
+  `(xml-file-handler ~file))
 
 (defmacro json-file
   "Specifies a JSON file handler"
   [file]
-  `(json-handler ~file))
+  `(json-file-handler ~file))
 
 (defmacro status
   "Specifies a status handler"
