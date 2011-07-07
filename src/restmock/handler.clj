@@ -27,6 +27,9 @@
 (defn text-handler [text]
   (fn [req] (response text)))
 
+(defn xml-handler [xml]
+  (fn [req] (xml-response-wrapper xml)))
+
 (defn xml-file-handler [file]
   (fn [req] (serve-file file xml-response-wrapper)))
 

@@ -1,5 +1,6 @@
 (ns restmock.dsl
   (:use restmock.handler
+        restmock.jaxws
         clojure.contrib.logging)
   )
 
@@ -64,6 +65,11 @@
   "Specifies a text response handler"
   [text]
   `(text-handler ~text))
+
+(defmacro xml
+  "Specifies an XML response handler"
+  [xml]
+  `(xml-handler ~xml))
 
 (defmacro xml-file
   "Specifies a xml file handler"
