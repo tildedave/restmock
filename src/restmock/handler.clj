@@ -36,8 +36,10 @@
 (defn json-file-handler [file]
   (fn [req] (serve-file file json-response-wrapper)))
 
-(defn status-handler [status]
-  (fn [req] {:status status}))
+(defn status-handler [status & [text]]
+  (if (nil? text)
+    (fn [req] {:status status})
+    (fn [req] (assoc (response text) :status status))))
 
 (defn- get-matching-routes [routes req]
   (filter (fn [r] ((:request r) req)) routes))

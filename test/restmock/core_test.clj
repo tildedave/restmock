@@ -2,8 +2,9 @@
   (:use [clojure.test])
   (:require [restmock.core :as core]))
 
-(testing "body expander"
-  (testing "should expand body"
-    (let [request {:body (new java.io.StringReader "pikachu")}]
-      (is (:body (core/expand-request-body request))
-          "pikachu"))))
+(deftest expand-request-body-test
+  (is (:body (core/expand-request-body
+              {:body (new java.io.StringReader "pikachu")}))
+      "pikachu"))
+
+(expand-request-body-test)
